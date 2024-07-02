@@ -1,0 +1,107 @@
+################################
+#                              #
+#     Lang file by Ynfuien     #
+#                              #
+################################
+
+
+#### Quick info:
+# 1. If you don't want a message to be sent, just set it empty - ''
+
+# 2. You can use MiniMessage formatting for custom colors and formats!
+# If you don't know how, then here is documentation:
+# https://docs.advntr.dev/minimessage/format.html
+
+# 3. PlaceholderAPI is supported
+
+# 4. Plugin placeholders are within curly brackets - {placeholder}
+# And can have additional flags:
+# ! - no formatting
+# @ - no papi
+# # - escaped double quotes (")
+# To use a flag for placeholder, append it before the name - {!placeholder}
+# You can also combine flags, so for example {@#placeholder}, will not parse PAPI placeholders,
+# and will escape double quotes (" will become \").
+# ! - is useful for player input, that is not supposed to be formatted
+# @ - for input that's supposed to be formatted, but not with papi
+# # - for things that can contain double quotes, and you want them in hover/click event
+
+
+# Prefix that will be used for {prefix} placeholder
+prefix: '<dark_aqua>[<bold><aqua>Y<gradient:white:#1BD96A>UpdateChecker</gradient></bold><dark_aqua>]<reset>'
+
+# Admin
+command-main-usage: '{prefix} <gray>Command''s usage: /{command} <reload | version>'
+command-main-reload-fail: '{prefix} <red>An error occurred while reloading plugin. Take a look in the console for more information!'
+command-main-reload-success: '{prefix} <aqua>Plugin was <green>successfully <aqua>reloaded!'
+command-main-version:
+  - '{prefix} <dark_aqua>Plugin info:'
+  - '{prefix} <aqua>Name: <white>{name}'
+  - '{prefix} <aqua>Version: <green>{version}'
+  - '{prefix} <aqua>Author: <click:open_url:"{website}"><hover:show_text:"{website}"><white>{author}</click>'
+
+## Updates
+# Help
+command-updates-help-no-commands: '{prefix} <red>You don''t have permission for any subcommand!'
+command-updates-help-header: '{prefix} <dark_aqua>Available commands:'
+command-updates-help-entry: '<click:suggest_command:"/{command} {subcommand}"><hover:show_text:"Click to enter the command"><blue>/{command} {subcommand}</click> <white>- <aqua>{description}'
+command-updates-check-description: "Checks updates for all plugins and datapacks"
+command-updates-show-description: "Shows results of the last check"
+# Check
+command-updates-check-start: '{prefix} <yellow>Checking for updates, this may take a while...'
+command-updates-check-is-running: '{prefix} <red>Check is already running!'
+command-updates-check-fail: '{prefix} <red>Something went wrong while checking for updates. Look into the console for more info.'
+command-updates-check-finish: '{prefix} <green>Finished <yellow>checking updates! You can <i>check out</i> the results with <hover:show_text:"<white>Click to run the command!"><click:run_command:"/{command} show"><gold>/{command} show</gold></click></hover>.'
+## Show
+command-updates-show-fail-no-check: '{prefix} <red>No update check was run yet! You can do it with <hover:show_text:"<white>Click to run the command!"><click:run_command:"/{command} check"><dark_red>/{command} check</dark_red></click></hover>.'
+command-updates-show-fail-check-running: '{prefix} <red>Plugin is currently checking for updates. You need to wait till it finishes!'
+command-updates-show-old-running-new: '{prefix} <red>Plugin is currently checking for new updates. In the meantime those are the old results:'
+## Available placeholders:
+# Time start/end: hour, minute, second, year, month, day
+# Duration: days, hours, minutes, seconds
+# Plugins/datapacks: all, modrinth, up-to-date, outdated
+command-updates-show:
+  - '{prefix} <blue><bold>Results'
+  - '<hover:show_text:"<white>Click to see more details about plugins!"><click:run_command:"/{command} show plugins"><dark_aqua>Plugins:</click></hover>'
+  - ' <white>- <aqua>From Modrinth: <#1bd96a>{plugins-modrinth} <gray>/ <gold>{plugins-all}'
+  - ' <white>- <aqua>Up-to-date: <#1bd96a>{plugins-up-to-date} <gray>/ <gold>{plugins-modrinth}'
+  - '<hover:show_text:"<white>Click to see more details about datapacks!"><click:run_command:"/{command} show datapacks"><dark_aqua>Datapacks:</click></hover>'
+  - ' <white>- <aqua>From Modrinth: <#1bd96a>{datapacks-modrinth} <gray>/ <gold>{datapacks-all}'
+  - ' <white>- <aqua>Up-to-date: <#1bd96a>{datapacks-up-to-date} <gray>/ <gold>{datapacks-modrinth}'
+  - '<gray>Check was performed at <hover:show_text:"<dark_gray>{time-start-day}.{time-start-month}.{time-start-year}"><dark_gray>{time-start-hour}:{time-start-minute}:{time-start-second}</dark_gray></hover> and took <dark_gray>{time-duration-minutes}m and {time-duration-seconds}s</dark_gray>.'
+  - '<gray>Use <dark_gray>/{command} show <plugins | datapacks></dark_gray> for more details!'
+command-updates-show-usage: '{prefix} <gray>Command usage: /{command} show [plugins | datapacks]'
+## Plugins
+# Placeholders for all messages:
+# {count}, {current-page}, {page-count}
+# For entries and url:
+# {number}, {versions-behind}, {minecraft-version}, {release-channels}, {url}
+# {project-id}, {project-title}, color, color-hex, description, downloads, followers
+# {current-version-id}, {current-version-name}, number, changelog, date-published
+# with the same for {new-version-x},
+# And for the footer:
+# {next-page}, {previous-page}
+command-updates-show-plugins-header: '{prefix} <blue>Plugins:'
+command-updates-show-plugins-entry-outdated: '<aqua>{number}. <hover:show_text:"<bold><#{project-color-hex}>■ <gold>{project-title} <#{project-color-hex}>■</bold><br><gray>{project-description}<br><br><dark_aqua>Current version: <aqua>{current-version-number}<br><dark_aqua>New version: <aqua>{new-version-number}<br><br><white>Click to open link to newer version"><click:open_url:"{url}"><gold>{project-title}</click></hover> <gray>- <red>{versions-behind} version(s) behind'
+command-updates-show-plugins-entry-up-to-date: '<aqua>{number}. <hover:show_text:"<bold><#{project-color-hex}>■ <gold>{project-title} <#{project-color-hex}>■</bold><br><gray>{project-description}<br><br><dark_aqua>Current version: <aqua>{current-version-number}<br><br><white>Click to open link to this version"><click:open_url:"{url}"><gold>{project-title}</click></hover> <gray>- <green>up to date'
+command-updates-show-plugins-entry-up-to-date-release: '<aqua>{number}. <hover:show_text:"<bold><#{project-color-hex}>■ <gold>{project-title} <#{project-color-hex}>■</bold><br><gray>{project-description}<br><br><dark_aqua>Current version: <aqua>{current-version-number}<br><br><white>Click to open link to this version"><click:open_url:"{url}"><gold>{project-title}</click></hover> <gray>- <hover:show_text:"<gray>Plugin is up to date considering your chosen channels ({release-channels}), but there is at least one newer version from a not-chosen channel."><green>up to date<gray>*</hover>'
+command-updates-show-plugins-entry-up-to-date-version: '<aqua>{number}. <hover:show_text:"<bold><#{project-color-hex}>■ <gold>{project-title} <#{project-color-hex}>■</bold><br><gray>{project-description}<br><br><dark_aqua>Current version: <aqua>{current-version-number}<br><br><white>Click to open link to this version"><click:open_url:"{url}"><gold>{project-title}</click></hover> <gray>- <hover:show_text:"<gray>Plugin is up to date considering server''s version ({minecraft-version}), but there is at least one newer release for a higher Minecraft version."><green>up to date<gray>**</hover>'
+command-updates-show-plugins-url: 'https://modrinth.com/project/{project-slug}/version/{new-version-id}'
+command-updates-show-plugins-footer-page-next: '<dark_gray><st>----------</st> <<< <yellow>{current-page} <gold>/ <yellow>{page-count} <hover:show_text:"<white>Click for the next page!"><click:run_command:"/{command} show plugins {next-page}"><#ff8332>>>></click></hover> <dark_gray><st>----------</st>'
+command-updates-show-plugins-footer-page-both: '<dark_gray><st>----------</st> <hover:show_text:"<white>Click for the previous page!"><click:run_command:"/{command} show plugins {previous-page}"><#ff8332><<<</click></hover> <yellow>{current-page} <gold>/ <yellow>{page-count} <hover:show_text:"<white>Click for the next page!"><click:run_command:"/{command} show plugins {next-page}"><#ff8332>>>></click></hover> <dark_gray><st>----------</st>'
+command-updates-show-plugins-footer-page-previous: '<dark_gray><st>----------</st> <hover:show_text:"<white>Click for the previous page!"><click:run_command:"/{command} show plugins {previous-page}"><#ff8332><<<</click></hover> <yellow>{current-page} <gold>/ <yellow>{page-count} <dark_gray>>>> <st>----------</st>'
+command-updates-show-plugins-footer-page-single: ''
+# Datapacks
+# The same placeholders are available for datapacks.
+command-updates-show-datapacks-header: '{prefix} <blue>Datapacks:'
+command-updates-show-datapacks-entry-outdated: '<aqua>{number}. <hover:show_text:"<bold><#{project-color-hex}>■ <gold>{project-title} <#{project-color-hex}>■</bold><br><gray>{project-description}<br><br><dark_aqua>Current version: <aqua>{current-version-number}<br><dark_aqua>New version: <aqua>{new-version-number}<br><br><white>Click to open link to newer version"><click:open_url:"{url}"><gold>{project-title}</click></hover> <gray>- <red>{versions-behind} version(s) behind'
+command-updates-show-datapacks-entry-up-to-date: '<aqua>{number}. <hover:show_text:"<bold><#{project-color-hex}>■ <gold>{project-title} <#{project-color-hex}>■</bold><br><gray>{project-description}<br><br><dark_aqua>Current version: <aqua>{current-version-number}<br><br><white>Click to open link to this version"><click:open_url:"{url}"><gold>{project-title}</click></hover> <gray>- <green>up to date'
+command-updates-show-datapacks-entry-up-to-date-release: '<aqua>{number}. <hover:show_text:"<bold><#{project-color-hex}>■ <gold>{project-title} <#{project-color-hex}>■</bold><br><gray>{project-description}<br><br><dark_aqua>Current version: <aqua>{current-version-number}<br><br><white>Click to open link to this version"><click:open_url:"{url}"><gold>{project-title}</click></hover> <gray>- <hover:show_text:"<gray>Datapack is up to date considering your chosen channels ({release-channels}), but there is at least one newer version from a not-chosen channel."><green>up to date<gray>*</hover>'
+command-updates-show-datapacks-entry-up-to-date-version: '<aqua>{number}. <hover:show_text:"<bold><#{project-color-hex}>■ <gold>{project-title} <#{project-color-hex}>■</bold><br><gray>{project-description}<br><br><dark_aqua>Current version: <aqua>{current-version-number}<br><br><white>Click to open link to this version"><click:open_url:"{url}"><gold>{project-title}</click></hover> <gray>- <hover:show_text:"<gray>Datapack is up to date considering server''s version ({minecraft-version}), but there is at least one newer release for a higher Minecraft version."><green>up to date<gray>**</hover>'
+command-updates-show-datapacks-url: 'https://modrinth.com/project/{project-slug}/version/{new-version-id}'
+command-updates-show-datapacks-footer-page-next: '<dark_gray><st>----------</st> <<< <yellow>{current-page} <gold>/ <yellow>{page-count} <hover:show_text:"<white>Click for the next page!"><click:run_command:"/{command} show datapacks {next-page}"><#ff8332>>>></click></hover> <dark_gray><st>----------</st>'
+command-updates-show-datapacks-footer-page-both: '<dark_gray><st>----------</st> <hover:show_text:"<white>Click for the previous page!"><click:run_command:"/{command} show datapacks {previous-page}"><#ff8332><<<</click></hover> <yellow>{current-page} <gold>/ <yellow>{page-count} <hover:show_text:"<white>Click for the next page!"><click:run_command:"/{command} show datapacks {next-page}"><#ff8332>>>></click></hover> <dark_gray><st>----------</st>'
+command-updates-show-datapacks-footer-page-previous: '<dark_gray><st>----------</st> <hover:show_text:"<white>Click for the previous page!"><click:run_command:"/{command} show datapacks {previous-page}"><#ff8332><<<</click></hover> <yellow>{current-page} <gold>/ <yellow>{page-count} <dark_gray>>>> <st>----------</st>'
+command-updates-show-datapacks-footer-page-single: ''
+
+check-progress-action-bar: '<gradient:gold:yellow>Progress: {state} <gray>/</gray> {goal}'

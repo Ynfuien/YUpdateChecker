@@ -1,0 +1,17 @@
+name: '${project.name}'
+version: '${project.version}'
+main: pl.ynfuien.yupdatechecker.YUpdateChecker
+api-version: '1.13'
+softdepend: [ PlaceholderAPI ]
+authors: [Ynfuien]
+description: '${project.description}'
+website: '${project.url}'
+
+commands:
+  yupdatechecker:
+    aliases: [yuc]
+    permission: yupdatechecker.admin
+
+  updates:
+    description: Checks plugin and datapack updates
+    permission: yupdatechecker.updates

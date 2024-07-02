@@ -1,0 +1,27 @@
+update-check:
+  # Whether to automatically check updates on server startup
+  on-startup: true
+
+  # How many threads to use.
+  # I don't see a point in using more than 2,
+  # but here you go, the power is in your hands!
+  threads: 4
+
+  # Release channels to consider.
+  # You can for example ignore beta and alpha releases.
+  consider-channels:
+    - release
+    - beta
+    - alpha
+
+command:
+  action-bar:
+    # Whether to show an action bar with current progress,
+    # to the player that run the check command.
+    enable: true
+    # Interval in ticks
+    interval: 2
+
+  # How many projects to show on one page of
+  # /updates show <plugins | datapacks>.
+  page-size: 10
