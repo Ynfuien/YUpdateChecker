@@ -15,11 +15,11 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-public class MainCommand implements CommandExecutor, TabCompleter {
+public class AdminCommand implements CommandExecutor, TabCompleter {
     private final YUpdateChecker instance;
     private final Subcommand[] subcommands;
 
-    public MainCommand(YUpdateChecker instance) {
+    public AdminCommand(YUpdateChecker instance) {
         this.instance = instance;
 
         this.subcommands = new Subcommand[] {

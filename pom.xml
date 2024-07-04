@@ -53,21 +53,16 @@
 
                             <createDependencyReducedPom>false</createDependencyReducedPom>
                             <relocations>
-                                <!--    HikariCP    -->
-                                <!--                                <relocation>-->
-                                <!--                                    <pattern>com.zaxxer.hikari</pattern>-->
-                                <!--                                    <shadedPattern>pl.ynfuien.yvanish.libs.hikari</shadedPattern>-->
-                                <!--                                </relocation>-->
                                 <!--    Dev library    -->
                                 <relocation>
                                     <pattern>pl.ynfuien.ydevlib</pattern>
                                     <shadedPattern>pl.ynfuien.yupdatechecker.libs.ydevlib</shadedPattern>
                                 </relocation>
                                 <!--    BStats    -->
-                                <!--                                <relocation>-->
-                                <!--                                    <pattern>org.bstats</pattern>-->
-                                <!--                                    <shadedPattern>pl.ynfuien.yvanish.libs.bstats</shadedPattern>-->
-                                <!--                                </relocation>-->
+                                <relocation>
+                                    <pattern>org.bstats</pattern>
+                                    <shadedPattern>pl.ynfuien.yupdatechecker.libs.bstats</shadedPattern>
+                                </relocation>
                             </relocations>
                         </configuration>
                     </execution>
@@ -110,7 +105,7 @@
 <!--        <dependency>-->
 <!--            <groupId>com.github.Ynfuien</groupId>-->
 <!--            <artifactId>YDevLib</artifactId>-->
-<!--            <version>1.0.1</version>-->
+<!--            <version>1.0.2</version>-->
 <!--            <scope>compile</scope>-->
 <!--        </dependency>-->
         <dependency>
@@ -121,16 +116,18 @@
         </dependency>
 
         <!--        Modrinth API Wrapper -->
-<!--        <dependency>-->
-<!--            <groupId>dev.masecla</groupId>-->
-<!--            <artifactId>Modrinth4J</artifactId>-->
-<!--            <version>2.2.0</version>-->
-<!--        </dependency>-->
-
         <dependency>
             <groupId>com.github.masecla22</groupId>
             <artifactId>Modrinth4J</artifactId>
             <version>-7598da2dab-1</version>
+        </dependency>
+
+        <!--        BStats-->
+        <dependency>
+            <groupId>org.bstats</groupId>
+            <artifactId>bstats-bukkit</artifactId>
+            <version>3.0.2</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 </project>

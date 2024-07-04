@@ -17,6 +17,8 @@ public class PluginConfig {
     public static int actionBarInterval = 40;
     public static int pageSize = 10;
 
+    public static int confirmDuration = 10;
+
     public static void load(ConfigurationSection config) {
         ConfigurationSection updateCheck = config.getConfigurationSection("update-check");
 
@@ -53,5 +55,7 @@ public class PluginConfig {
         actionBarInterval = command.getInt("action-bar.interval");
 
         pageSize = command.getInt("page-size");
+
+        confirmDuration = command.getInt("confirm-duration");
     }
 }

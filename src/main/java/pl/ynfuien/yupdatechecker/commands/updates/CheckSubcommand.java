@@ -4,12 +4,15 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import pl.ynfuien.ydevlib.utils.CommonPlaceholders;
 import pl.ynfuien.yupdatechecker.Lang;
 import pl.ynfuien.yupdatechecker.YUpdateChecker;
 import pl.ynfuien.yupdatechecker.commands.Subcommand;
 import pl.ynfuien.yupdatechecker.config.PluginConfig;
+import pl.ynfuien.yupdatechecker.core.CheckResult;
 import pl.ynfuien.yupdatechecker.core.Checker;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 
@@ -45,8 +48,18 @@ public class CheckSubcommand implements Subcommand {
     @Override
     public void run(CommandSender sender, String[] args, HashMap<String, Object> placeholders) {
         if (checker.isCheckRunning()) {
-            Lang.Message.COMMAND_UPDATES_CHECK_IS_RUNNING.send(sender, placeholders);
+            Lang.Message.COMMAND_UPDATES_CHECK_FAIL_IS_RUNNING.send(sender, placeholders);
             return;
+        }
+
+        CheckResult lastCheck = checker.getLastCheck();
+        if (lastCheck != null && !(args.length > 0 && args[0].equalsIgnoreCase("-y"))) {
+            Duration dur = Duration.ofMillis(System.currentTimeMillis() - lastCheck.times().end());
+            if (dur.toMinutes() < PluginConfig.confirmDuration) {
+                CommonPlaceholders.setDuration(placeholders, dur, null);
+                Lang.Message.COMMAND_UPDATES_CHECK_FAIL_RECENT.send(sender, placeholders);
+                return;
+            }
         }
 
         Lang.Message.COMMAND_UPDATES_CHECK_START.send(sender, placeholders);

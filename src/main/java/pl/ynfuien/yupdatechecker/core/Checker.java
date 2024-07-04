@@ -29,7 +29,6 @@ public class Checker {
     private final ModrinthAPI modrinthAPI;
 
     private static final List<String> SUPPORTED_LOADERS = getSupportedLoaders();
-//    private static final List<String> SUPPORTED_VERSION = List.of(Bukkit.getMinecraftVersion());
     private static final List<String> MINECRAFT_VERSIONS = new ArrayList<>();
     private static final String SUPPORTED_VERSION = Bukkit.getMinecraftVersion();
 
@@ -83,6 +82,12 @@ public class Checker {
             long startTimestamp = System.currentTimeMillis();
 
             List<ProjectFile> pluginFiles = getPluginFiles();
+            if (pluginFiles == null) {
+                isCheckRunning = false;
+                future.complete(null);
+                return;
+            }
+
             List<ProjectFile> dataPackFiles = getDataPackFiles();
 
             List<ProjectFile> files = new ArrayList<>(pluginFiles);
@@ -157,7 +162,12 @@ public class Checker {
 
     private List<ProjectFile> getPluginFiles() {
         File pluginsFolder = Bukkit.getPluginsFolder();
-        File[] plugins = pluginsFolder.listFiles((dir, name) -> name.endsWith(".jar") || name.endsWith(".jar.bu"));
+        File[] plugins = pluginsFolder.listFiles((dir, name) -> name.endsWith(".jar"));
+
+        if (plugins == null) {
+            YLogger.error("Couldn't read plugin files!");
+            return null;
+        }
 
         List<ProjectFile> result = new ArrayList<>();
         for (File plugin : plugins) {
@@ -178,6 +188,11 @@ public class Checker {
             if (!dataPacksFolder.exists()) continue;
 
             File[] zips = dataPacksFolder.listFiles((dir, name) -> name.endsWith(".zip"));
+            if (zips == null) {
+                YLogger.error(String.format("Couldn't read datapack files of world '%s'!", world.getName()));
+                continue;
+            }
+
             for (File zip : zips) {
                 if (zip.isDirectory()) continue;
 
@@ -192,9 +207,6 @@ public class Checker {
         File file = projectFile.file();
         ProjectFile.Type type = projectFile.type();
 
-        YLogger.debug(String.format("Checking file '%s'", file.getName()));
-
-        YLogger.debug("Hashing...");
         HashCode hash;
         try {
             hash = Files.asByteSource(file).hash(Hashing.sha512());
@@ -205,24 +217,17 @@ public class Checker {
         }
 
 
-        YLogger.debug("Fetching version...");
         ProjectVersion currentVersion;
         try {
             currentVersion = modrinthAPI.versions().files().getVersionByHash(FileHash.SHA512, hash.toString()).get();
         } catch (InterruptedException|ExecutionException e) {
-            YLogger.error(String.format("An error occurred while getting current version of file '%s'!", file.getName()));
+            YLogger.error(String.format("An error occurred while getting current project version of file '%s'!", file.getName()));
             e.printStackTrace();
             return null;
         }
+        if (currentVersion == null) return null;
 
 
-        if (currentVersion == null) {
-            YLogger.debug("It's null!");
-            return null;
-        }
-
-
-        YLogger.debug("Fetching project...");
         Project project;
         try {
             project = modrinthAPI.projects().get(currentVersion.getProjectId()).get();
@@ -231,14 +236,9 @@ public class Checker {
             e.printStackTrace();
             return null;
         }
-        if (project == null) {
-            YLogger.debug("It's null!");
-            return null;
-        }
+        if (project == null) return null;
 
         boolean isDataPack = type.equals(ProjectFile.Type.DATAPACK);
-
-        YLogger.debug("Fetching versions...");
         List<ProjectVersion> versions;
         try {
             GetProjectVersions.GetProjectVersionsRequest request = GetProjectVersions.GetProjectVersionsRequest
@@ -252,24 +252,8 @@ public class Checker {
             e.printStackTrace();
             return null;
         }
-        if (versions == null) {
-            YLogger.debug("It's null!");
-            return null;
-        }
+        if (versions == null) return null;
 
-        YLogger.debug("Version count: " + versions.size());
-//        List<ProjectVersion> newerVersions = new ArrayList<>();
-//        for (ProjectVersion ver : versions) {
-//            if (ver.getId().equalsIgnoreCase(currentVersion.getId())) break;
-//            if (!PluginConfig.considerChannels.contains(ver.getVersionType())) continue;
-//
-//            newerVersions.add(ver);
-//        }
-
-//        YLogger.debug(String.format("You are %d versions behind!", newerVersions.size()));
-
-//        ProjectVersion latest = newerVersions.isEmpty() ? currentVersion : newerVersions.get(0);
-//        return new ProjectCheckResult(project, currentVersion, latest, newerVersions.size());
         return new ProjectCheckResult(project, currentVersion, versions);
     }
 

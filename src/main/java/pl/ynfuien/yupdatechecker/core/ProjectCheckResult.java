@@ -8,12 +8,6 @@ import pl.ynfuien.yupdatechecker.config.PluginConfig;
 import java.util.ArrayList;
 import java.util.List;
 
-//public record ProjectCheckResult(Project project, ProjectVersion currentVersion, ProjectVersion latestVersion, int versionsBehind) {
-//    public boolean upToDate() {
-//        return versionsBehind == 0;
-//    }
-//}
-
 public class ProjectCheckResult {
     private final static String MINECRAFT_VERSION = Bukkit.getMinecraftVersion();
 

@@ -1,10 +1,9 @@
 update-check:
-  # Whether to automatically check updates on server startup
-  on-startup: true
+  # Whether to automatically check updates on server startup.
+  # You can then use /updates show without running /updates check.
+  on-startup: false
 
-  # How many threads to use.
-  # I don't see a point in using more than 2,
-  # but here you go, the power is in your hands!
+  # How many threads to use for update checking.
   threads: 4
 
   # Release channels to consider.
@@ -25,3 +24,7 @@ command:
   # How many projects to show on one page of
   # /updates show <plugins | datapacks>.
   page-size: 10
+
+  # How many minutes after an update check,
+  # running command again will show a warning.
+  confirm-duration: 10

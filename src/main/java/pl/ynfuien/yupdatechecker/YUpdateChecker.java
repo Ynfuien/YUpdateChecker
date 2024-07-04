@@ -2,14 +2,17 @@ package pl.ynfuien.yupdatechecker;
 
 import masecla.modrinth4j.client.agent.UserAgent;
 import masecla.modrinth4j.main.ModrinthAPI;
+import org.bstats.bukkit.Metrics;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import pl.ynfuien.ydevlib.config.ConfigHandler;
 import pl.ynfuien.ydevlib.config.ConfigObject;
 import pl.ynfuien.ydevlib.messages.YLogger;
-import pl.ynfuien.yupdatechecker.commands.main.MainCommand;
+import pl.ynfuien.yupdatechecker.commands.main.AdminCommand;
 import pl.ynfuien.yupdatechecker.commands.updates.UpdatesCommand;
 import pl.ynfuien.yupdatechecker.config.ConfigName;
 import pl.ynfuien.yupdatechecker.config.PluginConfig;
@@ -26,6 +29,7 @@ public final class YUpdateChecker extends JavaPlugin {
             .contact("ynfuien@gmail.com")
             .build(), "");
     private Checker checker = new Checker(this);
+
     private final ConfigHandler configHandler = new ConfigHandler(this);
     private ConfigObject config;
 
@@ -33,8 +37,6 @@ public final class YUpdateChecker extends JavaPlugin {
     public void onEnable() {
         instance = this;
         YLogger.setup("<dark_aqua>[<aqua>Y<gradient:white:#1BD96A>UpdateChecker</gradient><dark_aqua>] <white>", getComponentLogger());
-//        YLogger.setDebugging(true);
-
 
         // Configs
         loadConfigs();
@@ -45,6 +47,28 @@ public final class YUpdateChecker extends JavaPlugin {
 
         // Commands
         setupCommands();
+
+        // BStats
+        new Metrics(this, 22505);
+
+        // Startup update check
+        if (PluginConfig.onStartup) {
+            Bukkit.getScheduler().runTaskAsynchronously(instance, () -> {
+                HashMap<String, Object> placeholders = new HashMap<>() {{put("command", "updates");}};
+                ConsoleCommandSender console = Bukkit.getConsoleSender();
+
+                Lang.Message.COMMAND_UPDATES_CHECK_START.send(console, placeholders);
+
+                checker.check().thenAcceptAsync((checkResult) -> {
+                    if (checkResult == null) {
+                        Lang.Message.COMMAND_UPDATES_CHECK_FAIL.send(console, placeholders);
+                        return;
+                    }
+
+                    Lang.Message.COMMAND_UPDATES_CHECK_FINISH.send(console, placeholders);
+                });
+            });
+        }
 
         YLogger.info("Plugin successfully <green>enabled<white>!");
     }
@@ -57,7 +81,7 @@ public final class YUpdateChecker extends JavaPlugin {
 
     private void setupCommands() {
         HashMap<String, CommandExecutor> commands = new HashMap<>();
-        commands.put("yupdatechecker", new MainCommand(this));
+        commands.put("yupdatechecker", new AdminCommand(this));
         commands.put("updates", new UpdatesCommand(this));
 
         for (String name : commands.keySet()) {

@@ -9,7 +9,7 @@ import org.jetbrains.annotations.Nullable;
 import pl.ynfuien.yupdatechecker.Lang;
 import pl.ynfuien.yupdatechecker.YUpdateChecker;
 import pl.ynfuien.yupdatechecker.commands.Subcommand;
-import pl.ynfuien.yupdatechecker.commands.main.MainCommand;
+import pl.ynfuien.yupdatechecker.commands.main.AdminCommand;
 import pl.ynfuien.yupdatechecker.core.Checker;
 
 import java.util.Arrays;
@@ -76,6 +76,6 @@ public class UpdatesCommand implements CommandExecutor, TabCompleter {
 
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        return MainCommand.tabCompleteSubcommands(sender, subcommands, args);
+        return AdminCommand.tabCompleteSubcommands(sender, subcommands, args);
     }
 }
