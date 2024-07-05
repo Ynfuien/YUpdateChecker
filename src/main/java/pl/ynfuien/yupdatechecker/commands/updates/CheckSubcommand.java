@@ -91,7 +91,7 @@ public class CheckSubcommand implements Subcommand {
             p.sendActionBar(message);
 
             if (!checker.isCheckRunning()) task.cancel();
-        }, 5, PluginConfig.actionBarInterval);
+        }, 2, PluginConfig.actionBarInterval);
     }
 
     @Override

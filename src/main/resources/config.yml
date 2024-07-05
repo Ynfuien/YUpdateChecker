@@ -19,7 +19,7 @@ command:
     # to the player that run the check command.
     enable: true
     # Interval in ticks
-    interval: 2
+    interval: 1
 
   # How many projects to show on one page of
   # /updates show <plugins | datapacks>.
