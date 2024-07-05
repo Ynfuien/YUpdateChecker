@@ -98,9 +98,16 @@ public class ShowSubcommand implements Subcommand {
             return;
         }
 
+        Messages messages = new Messages(plugins);
+
         List<ProjectCheckResult> results = plugins ? result.plugins() : result.dataPacks();
         int resultsCount = results.size();
         placeholders.put("count", resultsCount);
+
+        if (resultsCount == 0) {
+            messages.EMPTY.send(sender, placeholders);
+            return;
+        }
 
         placeholders.put("minecraft-version", Bukkit.getMinecraftVersion());
         String channels = String.join(", ", PluginConfig.considerChannels.stream().map(versionType -> versionType.name().toLowerCase()).toList());
@@ -126,7 +133,6 @@ public class ShowSubcommand implements Subcommand {
         if (isPreviousPage) placeholders.put("previous-page", pageNumber - 1);
         if (isNextPage) placeholders.put("next-page", pageNumber + 1);
 
-        Messages messages = new Messages(plugins);
         messages.HEADER.send(sender, placeholders);
 
 
@@ -238,6 +244,7 @@ public class ShowSubcommand implements Subcommand {
     }
 
     protected class Messages {
+        protected final Lang.Message EMPTY;
         protected final Lang.Message HEADER;
         protected final Lang.Message ENTRY_OUTDATED;
         protected final Lang.Message ENTRY_UP_TO_DATE;
@@ -250,6 +257,7 @@ public class ShowSubcommand implements Subcommand {
         protected final Lang.Message FOOTER_PAGE_SINGLE;
 
         protected Messages(boolean plugins) {
+            EMPTY = plugins ? Lang.Message.COMMAND_UPDATES_SHOW_PLUGINS_EMPTY : Lang.Message.COMMAND_UPDATES_SHOW_DATAPACKS_EMPTY;
             HEADER = plugins ? Lang.Message.COMMAND_UPDATES_SHOW_PLUGINS_HEADER : Lang.Message.COMMAND_UPDATES_SHOW_DATAPACKS_HEADER;
             ENTRY_OUTDATED = plugins ? Lang.Message.COMMAND_UPDATES_SHOW_PLUGINS_ENTRY_OUTDATED : Lang.Message.COMMAND_UPDATES_SHOW_DATAPACKS_ENTRY_OUTDATED;
             ENTRY_UP_TO_DATE = plugins ? Lang.Message.COMMAND_UPDATES_SHOW_PLUGINS_ENTRY_UP_TO_DATE : Lang.Message.COMMAND_UPDATES_SHOW_DATAPACKS_ENTRY_UP_TO_DATE;
