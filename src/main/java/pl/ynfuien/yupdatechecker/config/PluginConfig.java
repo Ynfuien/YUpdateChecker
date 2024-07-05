@@ -43,7 +43,6 @@ public class PluginConfig {
                 }
             }
 
-            YLogger.info("Consider channels: " + considerChannels);
             if (considerChannels.isEmpty()) {
                 considerChannels = Set.of(ProjectVersion.VersionType.RELEASE, ProjectVersion.VersionType.BETA);
                 YLogger.warn("No release channels to consider are specified! Will use release and beta channels.");
