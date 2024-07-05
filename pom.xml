@@ -102,14 +102,8 @@
         </dependency>
 
         <!--        Dev library -->
-<!--        <dependency>-->
-<!--            <groupId>com.github.Ynfuien</groupId>-->
-<!--            <artifactId>YDevLib</artifactId>-->
-<!--            <version>1.0.2</version>-->
-<!--            <scope>compile</scope>-->
-<!--        </dependency>-->
         <dependency>
-            <groupId>pl.ynfuien</groupId>
+            <groupId>com.github.Ynfuien</groupId>
             <artifactId>YDevLib</artifactId>
             <version>1.0.2</version>
             <scope>compile</scope>
