@@ -85,6 +85,7 @@ public class CheckSubcommand implements Subcommand {
 
             placeholders.put("state", checker.getCurrentCheckState());
             placeholders.put("goal", checker.getCurrentCheckGoal());
+            placeholders.put("requests-sent", checker.getCurrentCheckRequestsSent());
 
             Component message = Lang.Message.CHECK_PROGRESS_ACTION_BAR.getComponent(sender, placeholders);
             p.sendActionBar(message);

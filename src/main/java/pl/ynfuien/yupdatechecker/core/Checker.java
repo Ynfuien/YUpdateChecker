@@ -37,6 +37,7 @@ public class Checker {
     private boolean isCheckRunning = false;
     private int currentCheckState = 0;
     private int currentCheckGoal = 0;
+    private int currentCheckRequestsSent = 0;
 
     public Checker(YUpdateChecker instance) {
         this.instance = instance;
@@ -46,6 +47,7 @@ public class Checker {
     private List<String> getMinecraftVersions() {
         List<GameVersion> versions;
         try {
+            currentCheckRequestsSent++;
             versions = modrinthAPI.tags().getGameVersions().get();
         } catch (InterruptedException | ExecutionException e) {
             if (e.getCause() instanceof UnknownHostException) {
@@ -97,6 +99,7 @@ public class Checker {
             List<ProjectCheckResult> dataPackResults = new ArrayList<>();
             currentCheckState = 0;
             currentCheckGoal = files.size();
+            currentCheckRequestsSent = 0;
 
             // Fetch newer Minecraft versions
             if (MINECRAFT_VERSIONS.isEmpty()) {
@@ -147,7 +150,7 @@ public class Checker {
 
                     long endTimestamp = System.currentTimeMillis();
                     CheckResult.Times times = new CheckResult.Times(startTimestamp, endTimestamp);
-                    CheckResult result = new CheckResult(pluginResults, pluginFiles.size(), dataPackResults, dataPackFiles.size(), times);
+                    CheckResult result = new CheckResult(pluginResults, pluginFiles.size(), dataPackResults, dataPackFiles.size(), times, currentCheckRequestsSent);
                     lastCheck = result;
 
                     isCheckRunning = false;
@@ -218,6 +221,7 @@ public class Checker {
 
         ProjectVersion currentVersion;
         try {
+            currentCheckRequestsSent++;
             currentVersion = modrinthAPI.versions().files().getVersionByHash(FileHash.SHA512, hash.toString()).get();
         } catch (InterruptedException|ExecutionException e) {
             YLogger.error(String.format("An error occurred while getting current project version of file '%s'!", file.getName()));
@@ -229,6 +233,7 @@ public class Checker {
 
         Project project;
         try {
+            currentCheckRequestsSent++;
             project = modrinthAPI.projects().get(currentVersion.getProjectId()).get();
         } catch (InterruptedException|ExecutionException e) {
             YLogger.error(String.format("An error occurred while getting project with id '%s'!", currentVersion.getProjectId()));
@@ -240,6 +245,7 @@ public class Checker {
         boolean isDataPack = type.equals(ProjectFile.Type.DATAPACK);
         List<ProjectVersion> versions;
         try {
+            currentCheckRequestsSent++;
             GetProjectVersions.GetProjectVersionsRequest request = GetProjectVersions.GetProjectVersionsRequest
                     .builder()
                     .loaders(isDataPack ? List.of("datapack") : SUPPORTED_LOADERS)
@@ -266,6 +272,10 @@ public class Checker {
 
     public int getCurrentCheckGoal() {
         return currentCheckGoal;
+    }
+
+    public int getCurrentCheckRequestsSent() {
+        return currentCheckRequestsSent;
     }
 
     public CheckResult getLastCheck() {

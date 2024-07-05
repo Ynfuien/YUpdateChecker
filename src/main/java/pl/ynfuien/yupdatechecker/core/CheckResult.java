@@ -2,7 +2,7 @@ package pl.ynfuien.yupdatechecker.core;
 
 import java.util.List;
 
-public record CheckResult(List<ProjectCheckResult> plugins, int allPluginsCount, List<ProjectCheckResult> dataPacks, int allDataPacksCount, Times times) {
+public record CheckResult(List<ProjectCheckResult> plugins, int allPluginsCount, List<ProjectCheckResult> dataPacks, int allDataPacksCount, Times times, int requestsSent) {
     // Plugins
     public int upToDatePluginsCount() {
         int count = 0;

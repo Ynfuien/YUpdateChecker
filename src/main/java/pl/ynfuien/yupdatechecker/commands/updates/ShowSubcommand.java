@@ -67,6 +67,8 @@ public class ShowSubcommand implements Subcommand {
 
         // General counts
         if (args.length == 0) {
+            placeholders.put("requests-sent", result.requestsSent());
+
             // Times
             CheckResult.Times times = result.times();
             CommonPlaceholders.setDateTime(placeholders, times.start(), "time-start");

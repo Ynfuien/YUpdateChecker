@@ -61,6 +61,7 @@ command-updates-show-old-running-new: '{prefix} <red>Plugin is currently checkin
 # Time start/end: hour, minute, second, year, month, day
 # Duration: days, hours, minutes, seconds
 # Plugins/datapacks: all, modrinth, up-to-date, outdated
+# And also: {requests-sent}
 command-updates-show:
   - '{prefix} <blue><bold>Results'
   - '<hover:show_text:"<white>Click to see more details about plugins!"><click:run_command:"/{command} show plugins"><dark_aqua>Plugins:</click></hover>'
@@ -69,7 +70,7 @@ command-updates-show:
   - '<hover:show_text:"<white>Click to see more details about datapacks!"><click:run_command:"/{command} show datapacks"><dark_aqua>Datapacks:</click></hover>'
   - ' <white>- <aqua>From Modrinth: <#1bd96a>{datapacks-modrinth} <gray>/ <gold>{datapacks-all}'
   - ' <white>- <aqua>Up-to-date: <#1bd96a>{datapacks-up-to-date} <gray>/ <gold>{datapacks-modrinth}'
-  - '<gray>Check was performed at <hover:show_text:"<dark_gray>{time-start-day}.{time-start-month}.{time-start-year}"><dark_gray>{time-start-hour}:{time-start-minute}:{time-start-second}</dark_gray></hover> and took <dark_gray>{time-duration-minutes}m and {time-duration-seconds}s</dark_gray>.'
+  - '<hover:show_text:"<dark_gray>Date: <gray>{time-start-day}.{time-start-month}.{time-start-year}<br><dark_gray>Requests sent: <gray>{requests-sent}"><gray>Check was performed at <dark_gray>{time-start-hour}:{time-start-minute}:{time-start-second}</dark_gray> and took <dark_gray>{time-duration-minutes}m and {time-duration-seconds}s</dark_gray>.</hover>'
   - '<gray>Use <dark_gray>/{command} show <plugins | datapacks></dark_gray> for more details!'
 command-updates-show-usage: '{prefix} <gray>Command usage: /{command} show [plugins | datapacks] [page]'
 ## Plugins
@@ -107,4 +108,6 @@ command-updates-show-datapacks-footer-page-both: '<dark_gray><st>----------</st>
 command-updates-show-datapacks-footer-page-previous: '<dark_gray><st>----------</st> <hover:show_text:"<white>Click for the previous page!"><click:run_command:"/{command} show datapacks {previous-page}"><#ff8332><<<</click></hover> <yellow>{current-page} <gold>/ <yellow>{page-count} <dark_gray>>>> <st>----------</st>'
 command-updates-show-datapacks-footer-page-single: ''
 
+# Placeholders:
+# {state}, {goal}, {requests-sent}
 check-progress-action-bar: '<gradient:gold:yellow>Progress: {state} <gray>/</gray> {goal}'
