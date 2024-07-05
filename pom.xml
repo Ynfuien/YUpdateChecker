@@ -10,7 +10,7 @@
     <packaging>jar</packaging>
 
     <name>YUpdateChecker</name>
-    <description>Modrinth update checker.</description>
+    <description>Plugin and datapack update checker for Modrinth projects.</description>
     <url>https://modrinth.com/project/yupdatechecker</url>
 
     <properties>
