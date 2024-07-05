@@ -11,10 +11,10 @@ import java.util.HashMap;
 public class Lang extends LangBase {
     public enum Message implements LangBase.Message {
         PREFIX,
-        COMMAND_MAIN_USAGE,
-        COMMAND_MAIN_RELOAD_FAIL,
-        COMMAND_MAIN_RELOAD_SUCCESS,
-        COMMAND_MAIN_VERSION,
+        COMMAND_ADMIN_USAGE,
+        COMMAND_ADMIN_RELOAD_FAIL,
+        COMMAND_ADMIN_RELOAD_SUCCESS,
+        COMMAND_ADMIN_VERSION,
 
         // Help
         COMMAND_UPDATES_HELP_NO_COMMANDS,

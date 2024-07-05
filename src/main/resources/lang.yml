@@ -19,7 +19,7 @@
 # ! - no formatting
 # @ - no papi
 # # - escaped double quotes (")
-# To use a flag for placeholder, append it before the name - {!placeholder}
+# To use a flag for a placeholder, append it before the name - {!placeholder}
 # You can also combine flags, so for example {@#placeholder}, will not parse PAPI placeholders,
 # and will escape double quotes (" will become \").
 # ! - is useful for player input, that is not supposed to be formatted
@@ -31,10 +31,10 @@
 prefix: '<dark_aqua>[<bold><aqua>Y<gradient:white:#1BD96A>UpdateChecker</gradient></bold><dark_aqua>]<reset>'
 
 # Admin
-command-main-usage: '{prefix} <gray>Command''s usage: /{command} <reload | version>'
-command-main-reload-fail: '{prefix} <red>An error occurred while reloading plugin. Take a look in the console for more information!'
-command-main-reload-success: '{prefix} <aqua>Plugin was <green>successfully <aqua>reloaded!'
-command-main-version:
+command-admin-usage: '{prefix} <gray>Command''s usage: /{command} <reload | version>'
+command-admin-reload-fail: '{prefix} <red>An error occurred while reloading plugin. Take a look in the console for more information!'
+command-admin-reload-success: '{prefix} <aqua>Plugin was <green>successfully <aqua>reloaded!'
+command-admin-version:
   - '{prefix} <dark_aqua>Plugin info:'
   - '{prefix} <aqua>Name: <white>{name}'
   - '{prefix} <aqua>Version: <green>{version}'

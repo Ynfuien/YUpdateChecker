@@ -46,7 +46,7 @@ public class VersionSubcommand implements Subcommand {
         placeholders.put("description", info.getDescription());
         placeholders.put("website", info.getWebsite());
 
-        Lang.Message.COMMAND_MAIN_VERSION.send(sender, placeholders);
+        Lang.Message.COMMAND_ADMIN_VERSION.send(sender, placeholders);
     }
 
     @Override

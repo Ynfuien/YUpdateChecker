@@ -33,7 +33,7 @@ public class AdminCommand implements CommandExecutor, TabCompleter {
         HashMap<String, Object> placeholders = new HashMap<>() {{put("command", label);}};
 
         if (args.length == 0) {
-            Lang.Message.COMMAND_MAIN_USAGE.send(sender, placeholders);
+            Lang.Message.COMMAND_ADMIN_USAGE.send(sender, placeholders);
             return true;
         }
 
@@ -48,7 +48,7 @@ public class AdminCommand implements CommandExecutor, TabCompleter {
             return true;
         }
 
-        Lang.Message.COMMAND_MAIN_USAGE.send(sender, placeholders);
+        Lang.Message.COMMAND_ADMIN_USAGE.send(sender, placeholders);
         return true;
     }
 
