@@ -107,7 +107,6 @@ public class Checker {
                     return;
                 }
 
-                YLogger.info("Versions: " + versions);
                 MINECRAFT_VERSIONS.addAll(versions);
             }
 
