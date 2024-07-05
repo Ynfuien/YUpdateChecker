@@ -6,7 +6,7 @@ Plugin and datapack update checker that works out of the box. No need to configu
 Supports Paper 1.20+
 
 ## How it works?
-It's really simple. Plugin hashes a file (.jar or .zip), checks the hash using Modrinth API and logs the results. Yep, that's it. Modrinth is doing the heavy lifting by hashing every single file that is uploaded and then making it available via their API. Only caveat is - you can't change the contents of a downloaded jar or datapack. So no editing `plugin.yml` or MC functions. That's how hashing works, different file - different hash. I mean, you can change it of course, it just won't be picked by the plugin ¯\_(ツ)_/¯ 
+It's really simple. Plugin hashes a file (.jar or .zip), checks the hash using Modrinth API and logs the results. Yep, that's it. Modrinth is doing the heavy lifting by hashing every single file that is uploaded and then making it available via their API. Only caveat is - you can't change the contents of a downloaded jar or datapack. So no editing `plugin.yml` or MC functions. That's how hashing works, different file - different hash. I mean, you can change it of course, it just won't be picked by the plugin ¯\\_(ツ)\_/¯
 
 ### Additional info
 - Messages are fully customizable  with a lang file, supporting [PlaceholderAPI](https://github.com/PlaceholderAPI/PlaceholderAPI) and [MiniMessage](https://docs.advntr.dev/minimessage/index.html)
