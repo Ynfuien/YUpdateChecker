@@ -206,11 +206,32 @@ public class ShowSubcommand implements Subcommand {
     @Override
     public List<String> getTabCompletions(CommandSender sender, String[] args) {
         List<String> completions = new ArrayList<>();
-        if (args.length > 1) return completions;
+        if (args.length > 2) return completions;
 
         String arg1 = args[0].toLowerCase();
-        for (String completion : new String[] {"plugins", "datapacks"}) {
-            if (completion.startsWith(arg1)) completions.add(completion);
+        if (args.length == 1) {
+            for (String completion : new String[] {"plugins", "datapacks"}) {
+                if (completion.startsWith(arg1)) completions.add(completion);
+            }
+
+            return completions;
+        }
+
+        CheckResult result = checker.getLastCheck();
+        if (result == null) return completions;
+
+        boolean plugins = arg1.equals("plugins");
+        if (!plugins && !arg1.equals("datapacks")) return completions;
+
+        List<ProjectCheckResult> results = plugins ? result.plugins() : result.dataPacks();
+        int pageCount = (int) Math.ceil(results.size() / (double) PluginConfig.pageSize);
+        if (pageCount < 2) return completions;
+
+        String arg2 = args[1];
+        for (int i = 0; i < pageCount; i++) {
+            String value = String.valueOf(i + 1);
+
+            if (value.startsWith(arg2)) completions.add(value);
         }
 
         return completions;
