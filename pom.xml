@@ -63,6 +63,11 @@
                                     <pattern>org.bstats</pattern>
                                     <shadedPattern>pl.ynfuien.yupdatechecker.libs.bstats</shadedPattern>
                                 </relocation>
+                                <!--    Modrinth4J    -->
+                                <relocation>
+                                    <pattern>masecla.modrinth4j</pattern>
+                                    <shadedPattern>pl.ynfuien.yupdatechecker.libs.modrinth4j</shadedPattern>
+                                </relocation>
                             </relocations>
                         </configuration>
                     </execution>
