@@ -10,7 +10,6 @@ import pl.ynfuien.yupdatechecker.Lang;
 import pl.ynfuien.yupdatechecker.YUpdateChecker;
 import pl.ynfuien.yupdatechecker.commands.Subcommand;
 import pl.ynfuien.yupdatechecker.commands.main.AdminCommand;
-import pl.ynfuien.yupdatechecker.core.Checker;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -18,12 +17,10 @@ import java.util.List;
 
 public class UpdatesCommand implements CommandExecutor, TabCompleter {
     private final YUpdateChecker instance;
-    private final Checker checker;
     private final Subcommand[] subcommands;
 
     public UpdatesCommand(YUpdateChecker instance) {
         this.instance = instance;
-        this.checker = instance.getChecker();
 
         this.subcommands = new Subcommand[] {
             new CheckSubcommand(instance),

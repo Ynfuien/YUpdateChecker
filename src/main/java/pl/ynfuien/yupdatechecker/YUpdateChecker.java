@@ -1,7 +1,5 @@
 package pl.ynfuien.yupdatechecker;
 
-import masecla.modrinth4j.client.agent.UserAgent;
-import masecla.modrinth4j.main.ModrinthAPI;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandExecutor;
@@ -17,18 +15,21 @@ import pl.ynfuien.yupdatechecker.commands.updates.UpdatesCommand;
 import pl.ynfuien.yupdatechecker.config.ConfigName;
 import pl.ynfuien.yupdatechecker.config.PluginConfig;
 import pl.ynfuien.yupdatechecker.core.Checker;
+import pl.ynfuien.yupdatechecker.core.modrinth.ModrinthAPI;
 
 import java.util.HashMap;
 
 public final class YUpdateChecker extends JavaPlugin {
     private static YUpdateChecker instance;
-    private ModrinthAPI modrinthAPI = ModrinthAPI.rateLimited(UserAgent.builder()
-            .authorUsername("Ynfuien")
-            .projectName("YUpdateChecker")
-            .projectVersion(getPluginMeta().getVersion())
-            .contact("ynfuien@gmail.com")
-            .build(), "");
-    private Checker checker = new Checker(this);
+
+    private ModrinthAPI modrinthAPI = new ModrinthAPI(
+            new ModrinthAPI.UserAgent(
+                    "Ynfuien",
+                    getPluginMeta().getName(),
+                    getPluginMeta().getVersion(),
+                    "ynfuien@gmail.com")
+    );
+    private final Checker checker = new Checker(this);
 
     private final ConfigHandler configHandler = new ConfigHandler(this);
     private ConfigObject config;

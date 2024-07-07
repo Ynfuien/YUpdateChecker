@@ -3,17 +3,15 @@ package pl.ynfuien.yupdatechecker.core;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.Hashing;
 import com.google.common.io.Files;
-import masecla.modrinth4j.endpoints.version.GetProjectVersions;
-import masecla.modrinth4j.main.ModrinthAPI;
-import masecla.modrinth4j.model.project.Project;
-import masecla.modrinth4j.model.tags.GameVersion;
-import masecla.modrinth4j.model.version.FileHash;
-import masecla.modrinth4j.model.version.ProjectVersion;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import pl.ynfuien.ydevlib.messages.YLogger;
 import pl.ynfuien.yupdatechecker.YUpdateChecker;
 import pl.ynfuien.yupdatechecker.config.PluginConfig;
+import pl.ynfuien.yupdatechecker.core.modrinth.ModrinthAPI;
+import pl.ynfuien.yupdatechecker.core.modrinth.model.Project;
+import pl.ynfuien.yupdatechecker.core.modrinth.model.GameVersion;
+import pl.ynfuien.yupdatechecker.core.modrinth.model.ProjectVersion;
 
 import java.io.File;
 import java.io.IOException;
@@ -48,7 +46,7 @@ public class Checker {
         List<GameVersion> versions;
         try {
             currentCheckRequestsSent++;
-            versions = modrinthAPI.tags().getGameVersions().get();
+            versions = modrinthAPI.getGameVersionTags();
         } catch (InterruptedException | ExecutionException e) {
             if (e.getCause() instanceof UnknownHostException) {
                 YLogger.error("An error occurred while fetching Minecraft versions. Is there an internet connection?");
@@ -222,7 +220,7 @@ public class Checker {
         ProjectVersion currentVersion;
         try {
             currentCheckRequestsSent++;
-            currentVersion = modrinthAPI.versions().files().getVersionByHash(FileHash.SHA512, hash.toString()).get();
+            currentVersion = modrinthAPI.getVersionFile(hash.toString());
         } catch (InterruptedException|ExecutionException e) {
             YLogger.error(String.format("An error occurred while getting current project version of file '%s'!", file.getName()));
             e.printStackTrace();
@@ -234,7 +232,7 @@ public class Checker {
         Project project;
         try {
             currentCheckRequestsSent++;
-            project = modrinthAPI.projects().get(currentVersion.getProjectId()).get();
+            project = modrinthAPI.getProject(currentVersion.getProjectId());
         } catch (InterruptedException|ExecutionException e) {
             YLogger.error(String.format("An error occurred while getting project with id '%s'!", currentVersion.getProjectId()));
             e.printStackTrace();
@@ -246,12 +244,9 @@ public class Checker {
         List<ProjectVersion> versions;
         try {
             currentCheckRequestsSent++;
-            GetProjectVersions.GetProjectVersionsRequest request = GetProjectVersions.GetProjectVersionsRequest
-                    .builder()
-                    .loaders(isDataPack ? List.of("datapack") : SUPPORTED_LOADERS)
-                    .gameVersions(MINECRAFT_VERSIONS)
-                    .build();
-            versions = modrinthAPI.versions().getProjectVersions(project.getSlug(), request).get();
+
+            List<String> loaders = isDataPack ? List.of("datapack") : SUPPORTED_LOADERS;
+            versions = modrinthAPI.getProjectVersions(project.getSlug(), loaders, MINECRAFT_VERSIONS);
         } catch (InterruptedException|ExecutionException e) {
             YLogger.error(String.format("An error occurred while getting project versions for '%s'!", project.getSlug()));
             e.printStackTrace();

@@ -1,6 +1,5 @@
 package pl.ynfuien.yupdatechecker.config;
 
-import masecla.modrinth4j.model.version.ProjectVersion;
 import org.bukkit.configuration.ConfigurationSection;
 import pl.ynfuien.ydevlib.messages.YLogger;
 
@@ -11,7 +10,7 @@ import java.util.Set;
 public class PluginConfig {
     public static boolean onStartup = false;
     public static int threads = 2;
-    public static Set<ProjectVersion.VersionType> considerChannels = new HashSet<>();
+    public static Set<String> considerChannels = new HashSet<>();
 
     public static boolean actionBarEnable = true;
     public static int actionBarInterval = 40;
@@ -35,16 +34,18 @@ public class PluginConfig {
 
             List<String> channels = updateCheck.getStringList("consider-channels");
             for (String channel : channels) {
-                try {
-                    ProjectVersion.VersionType type = ProjectVersion.VersionType.valueOf(channel.toUpperCase());
-                    considerChannels.add(type);
-                } catch (IllegalArgumentException e) {
+                channel = channel.toLowerCase();
+
+                if (!channel.equals("release") && !channel.equals("beta") && !channel.equals("alpha")) {
                     YLogger.error(String.format("Release channel '%s' is incorrect! It won't be used.", channel));
+                    continue;
                 }
+
+                considerChannels.add(channel);
             }
 
             if (considerChannels.isEmpty()) {
-                considerChannels = Set.of(ProjectVersion.VersionType.RELEASE, ProjectVersion.VersionType.BETA);
+                considerChannels = Set.of("release", "beta");
                 YLogger.warn("No release channels to consider are specified! Will use release and beta channels.");
             }
         }

@@ -1,7 +1,6 @@
 package pl.ynfuien.yupdatechecker.commands.updates;
 
-import masecla.modrinth4j.model.project.Project;
-import masecla.modrinth4j.model.version.ProjectVersion;
+import com.google.gson.Gson;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import pl.ynfuien.ydevlib.utils.CommonPlaceholders;
@@ -12,6 +11,8 @@ import pl.ynfuien.yupdatechecker.config.PluginConfig;
 import pl.ynfuien.yupdatechecker.core.CheckResult;
 import pl.ynfuien.yupdatechecker.core.Checker;
 import pl.ynfuien.yupdatechecker.core.ProjectCheckResult;
+import pl.ynfuien.yupdatechecker.core.modrinth.model.Project;
+import pl.ynfuien.yupdatechecker.core.modrinth.model.ProjectVersion;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -112,7 +113,7 @@ public class ShowSubcommand implements Subcommand {
         }
 
         placeholders.put("minecraft-version", Bukkit.getMinecraftVersion());
-        String channels = String.join(", ", PluginConfig.considerChannels.stream().map(versionType -> versionType.name().toLowerCase()).toList());
+        String channels = String.join(", ", PluginConfig.considerChannels);
         placeholders.put("release-channels", channels);
 
         int pageNumber = 1;

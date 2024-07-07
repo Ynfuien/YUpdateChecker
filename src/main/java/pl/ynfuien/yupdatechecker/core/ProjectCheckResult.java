@@ -1,9 +1,9 @@
 package pl.ynfuien.yupdatechecker.core;
 
-import masecla.modrinth4j.model.project.Project;
-import masecla.modrinth4j.model.version.ProjectVersion;
 import org.bukkit.Bukkit;
 import pl.ynfuien.yupdatechecker.config.PluginConfig;
+import pl.ynfuien.yupdatechecker.core.modrinth.model.Project;
+import pl.ynfuien.yupdatechecker.core.modrinth.model.ProjectVersion;
 
 import java.util.ArrayList;
 import java.util.List;

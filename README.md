@@ -1,7 +1,7 @@
 [![Discord](https://img.shields.io/discord/1236019317208776786?style=flat&logo=discord&label=Discord&color=%235d6af2
 )](https://discord.gg/kZJhKZ48j8)
 # YUpdateChecker
-Plugin and datapack update checker that works out of the box. No need to configure anything. Too good to be true? Well, yes. The catch is that it works only with projects downloaded from Modrinth. Thanks to their awesome [API](https://docs.modrinth.com) and a Java [wrapper](https://github.com/masecla22/Modrinth4J) by masecla22 that saved me a lot of work.
+Plugin and datapack update checker that works out of the box. No need to configure anything. Too good to be true? Well, yes. The catch is that it works only with projects downloaded from Modrinth, thanks to their awesome [API](https://docs.modrinth.com).
 
 Supports Paper 1.20+
 

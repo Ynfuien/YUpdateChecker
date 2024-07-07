@@ -63,11 +63,6 @@
                                     <pattern>org.bstats</pattern>
                                     <shadedPattern>pl.ynfuien.yupdatechecker.libs.bstats</shadedPattern>
                                 </relocation>
-                                <!--    Modrinth4J    -->
-                                <relocation>
-                                    <pattern>masecla.modrinth4j</pattern>
-                                    <shadedPattern>pl.ynfuien.yupdatechecker.libs.modrinth4j</shadedPattern>
-                                </relocation>
                             </relocations>
                         </configuration>
                     </execution>
@@ -114,11 +109,12 @@
             <scope>compile</scope>
         </dependency>
 
-        <!--        Modrinth API Wrapper -->
+        <!--        URI Builder-->
         <dependency>
-            <groupId>com.github.masecla22</groupId>
-            <artifactId>Modrinth4J</artifactId>
-            <version>-7598da2dab-1</version>
+            <groupId>net.moznion</groupId>
+            <artifactId>uribuilder-tiny</artifactId>
+            <version>2.7.1</version>
+            <scope>compile</scope>
         </dependency>
 
         <!--        BStats-->
