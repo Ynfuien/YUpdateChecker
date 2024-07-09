@@ -1,6 +1,5 @@
 package pl.ynfuien.yupdatechecker.commands.updates;
 
-import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -52,6 +51,7 @@ public class CheckSubcommand implements Subcommand {
             return;
         }
 
+        // Recent check warning
         CheckResult lastCheck = checker.getLastCheck();
         if (lastCheck != null && !(args.length > 0 && args[0].equalsIgnoreCase("-y"))) {
             Duration dur = Duration.ofMillis(System.currentTimeMillis() - lastCheck.times().end());
@@ -62,8 +62,8 @@ public class CheckSubcommand implements Subcommand {
             }
         }
 
+        // Check start
         Lang.Message.COMMAND_UPDATES_CHECK_START.send(sender, placeholders);
-
         checker.check().thenAcceptAsync((checkResult) -> {
             if (checkResult == null) {
                 Lang.Message.COMMAND_UPDATES_CHECK_FAIL.send(sender, placeholders);
@@ -74,21 +74,33 @@ public class CheckSubcommand implements Subcommand {
         });
 
 
+        // Action bar stuff
         if (!PluginConfig.actionBarEnable) return;
         if (!(sender instanceof Player p)) return;
 
+        Checker.CurrentCheck currentCheck = checker.getCurrentCheck();
         Bukkit.getScheduler().runTaskTimerAsynchronously(instance, (task) -> {
             if (!p.isOnline()) {
                 task.cancel();
                 return;
             }
 
-            placeholders.put("state", checker.getCurrentCheckState());
-            placeholders.put("goal", checker.getCurrentCheckGoal());
-            placeholders.put("requests-sent", checker.getCurrentCheckRequestsSent());
+            Lang.Message message = null;
 
-            Component message = Lang.Message.CHECK_PROGRESS_ACTION_BAR.getComponent(sender, placeholders);
-            p.sendActionBar(message);
+            placeholders.put("progress", currentCheck.getProgress());
+            placeholders.put("goal", currentCheck.getGoal());
+            placeholders.put("requests-sent", currentCheck.getRequestsSent());
+
+
+            Checker.CheckState state = currentCheck.getState();
+            switch (state) {
+                case HASHING -> message = Lang.Message.CHECK_PROGRESS_ACTION_BAR_HASHING;
+                case CHECKING_HASHES -> message = Lang.Message.CHECK_PROGRESS_ACTION_BAR_CHECKING_HASHES;
+                case GETTING_PROJECTS -> message = Lang.Message.CHECK_PROGRESS_ACTION_BAR_GETTING_PROJECTS;
+                case GETTING_VERSIONS -> message = Lang.Message.CHECK_PROGRESS_ACTION_BAR_GETTING_VERSIONS;
+            }
+
+            if (message != null) p.sendActionBar(message.getComponent(sender, placeholders));
 
             if (!checker.isCheckRunning()) task.cancel();
         }, 2, PluginConfig.actionBarInterval);

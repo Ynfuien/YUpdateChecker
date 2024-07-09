@@ -1,6 +1,5 @@
 package pl.ynfuien.yupdatechecker.commands.updates;
 
-import com.google.gson.Gson;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import pl.ynfuien.ydevlib.utils.CommonPlaceholders;

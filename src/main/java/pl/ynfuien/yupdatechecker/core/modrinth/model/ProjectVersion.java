@@ -8,22 +8,22 @@ import java.util.Map;
 // Inspiration from Modrinth4J
 // https://github.com/masecla22/Modrinth4J
 public class ProjectVersion {
-    private String id;
-    private String projectId;
-    private String authorId;
+    private final String id;
+    private final String projectId;
+    private final String authorId;
 
-    private String name;
-    private String versionNumber;
-    private String changelog;
+    private final String name;
+    private final String versionNumber;
+    private final String changelog;
 
-    private String versionType;
-    private List<String> gameVersions;
-    private List<String> loaders;
+    private final String versionType;
+    private final List<String> gameVersions;
+    private final List<String> loaders;
 
-    private Instant datePublished;
+    private final Instant datePublished;
 
-    private int downloads;
-    private boolean featured;
+    private final int downloads;
+    private final boolean featured;
 
     public ProjectVersion(Map<String, Object> jsonMap) {
         id = (String) jsonMap.get("id");

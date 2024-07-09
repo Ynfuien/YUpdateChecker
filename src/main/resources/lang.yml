@@ -109,5 +109,8 @@ command-updates-show-datapacks-footer-page-previous: '<dark_gray><st>----------<
 command-updates-show-datapacks-footer-page-single: ''
 
 # Placeholders:
-# {state}, {goal}, {requests-sent}
-check-progress-action-bar: '<gradient:gold:yellow>Progress: {state} <gray>/</gray> {goal}'
+# {progress}, {goal}
+check-progress-action-bar-hashing: '<gradient:gold:yellow>Hashing files: {progress} <gray>/</gray> {goal}'
+check-progress-action-bar-checking-hashes: '<gradient:gold:yellow>Checking hashes...'
+check-progress-action-bar-getting-projects: '<gradient:gold:yellow>Getting projects data...'
+check-progress-action-bar-getting-versions: '<gradient:gold:yellow>Getting versions: {progress} <gray>/</gray> {goal}'

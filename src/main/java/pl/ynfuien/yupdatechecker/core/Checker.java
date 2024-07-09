@@ -9,18 +9,17 @@ import pl.ynfuien.ydevlib.messages.YLogger;
 import pl.ynfuien.yupdatechecker.YUpdateChecker;
 import pl.ynfuien.yupdatechecker.config.PluginConfig;
 import pl.ynfuien.yupdatechecker.core.modrinth.ModrinthAPI;
-import pl.ynfuien.yupdatechecker.core.modrinth.model.Project;
 import pl.ynfuien.yupdatechecker.core.modrinth.model.GameVersion;
+import pl.ynfuien.yupdatechecker.core.modrinth.model.Project;
 import pl.ynfuien.yupdatechecker.core.modrinth.model.ProjectVersion;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Checker {
     private final YUpdateChecker instance;
@@ -30,12 +29,13 @@ public class Checker {
     private static final List<String> MINECRAFT_VERSIONS = new ArrayList<>();
     private static final String SUPPORTED_VERSION = Bukkit.getMinecraftVersion();
 
+    private static final Comparator<ProjectCheckResult> PROJECT_COMPARATOR =
+            (left, right) -> left.project().getTitle().compareToIgnoreCase(right.project().getTitle());
+
     private CheckResult lastCheck = null;
 
     private boolean isCheckRunning = false;
-    private int currentCheckState = 0;
-    private int currentCheckGoal = 0;
-    private int currentCheckRequestsSent = 0;
+    private CurrentCheck currentCheck = new CurrentCheck();
 
     public Checker(YUpdateChecker instance) {
         this.instance = instance;
@@ -45,22 +45,21 @@ public class Checker {
     private List<String> getMinecraftVersions() {
         List<GameVersion> versions;
         try {
-            currentCheckRequestsSent++;
+            currentCheck.incrementRequests();
             versions = modrinthAPI.getGameVersionTags();
-        } catch (InterruptedException | ExecutionException e) {
-            if (e.getCause() instanceof UnknownHostException) {
-                YLogger.error("An error occurred while fetching Minecraft versions. Is there an internet connection?");
-            } else {
+        } catch (InterruptedException | IOException e) {
+//            if (e.getCause() instanceof UnknownHostException) {
+//                YLogger.error("An error occurred while fetching Minecraft versions. Is there an internet connection?");
+//            } else {
                 YLogger.error("An error occurred while fetching Minecraft versions:");
-            }
+//            }
 
             e.printStackTrace();
             return null;
         }
 
         List<String> mcVersions = new ArrayList<>();
-        for (int i = 0; i < versions.size(); i++) {
-            GameVersion gameVersion = versions.get(i);
+        for (GameVersion gameVersion : versions) {
             if (!gameVersion.getVersionType().equalsIgnoreCase("release")) continue;
 
             String version = gameVersion.getVersion();
@@ -76,11 +75,14 @@ public class Checker {
         if (isCheckRunning) return null;
 
         isCheckRunning = true;
+        currentCheck.reset();
         CompletableFuture<CheckResult> future = new CompletableFuture<>();
+
 
         Bukkit.getScheduler().runTaskAsynchronously(instance, () -> {
             long startTimestamp = System.currentTimeMillis();
 
+            // Get plugin and datapack files
             List<ProjectFile> pluginFiles = getPluginFiles();
             if (pluginFiles == null) {
                 isCheckRunning = false;
@@ -93,13 +95,9 @@ public class Checker {
             List<ProjectFile> files = new ArrayList<>(pluginFiles);
             files.addAll(dataPackFiles);
 
-            List<ProjectCheckResult> pluginResults = new ArrayList<>();
-            List<ProjectCheckResult> dataPackResults = new ArrayList<>();
-            currentCheckState = 0;
-            currentCheckGoal = files.size();
-            currentCheckRequestsSent = 0;
+            currentCheck.setGoal(files.size());
 
-            // Fetch newer Minecraft versions
+            // Fetch Minecraft versions, they will be used later
             if (MINECRAFT_VERSIONS.isEmpty()) {
                 List<String> versions = getMinecraftVersions();
                 if (versions == null) {
@@ -111,44 +109,126 @@ public class Checker {
                 MINECRAFT_VERSIONS.addAll(versions);
             }
 
-            List<List<ProjectFile>> threadFiles = new ArrayList<>();
+            // Hash files
+            List<String> hashes = new ArrayList<>();
+            for (ProjectFile projectFile : files) {
+                File file = projectFile.file();
+
+                HashCode hash;
+                try {
+                    hash = Files.asByteSource(file).hash(Hashing.sha512());
+                    hashes.add(hash.toString());
+                } catch (IOException e) {
+                    YLogger.error(String.format("An error occurred while hashing file '%s'!", file.getName()));
+                    e.printStackTrace();
+                }
+
+                currentCheck.incrementProgress();
+            }
+
+            // Check hashes
+            currentCheck.incrementState();
+            List<ProjectVersion> currentVersions;
+            try {
+                currentCheck.incrementRequests();
+                currentVersions = modrinthAPI.getVersionFiles(hashes);
+            } catch (InterruptedException | IOException e) {
+                YLogger.error("An error occurred while getting project version files from hashes.");
+                e.printStackTrace();
+                return;
+            }
+            if (currentVersions == null) return;
+
+
+            // Get projects of the gotten versions
+            currentCheck.incrementState();
+            List<Project> projects;
+            try {
+                currentCheck.incrementRequests();
+
+                List<String> projectIds = currentVersions.stream().map(ProjectVersion::getProjectId).toList();
+                projects = modrinthAPI.getProjects(projectIds);
+            } catch (InterruptedException | IOException e) {
+                YLogger.error("An error occurred while getting projects data.");
+                e.printStackTrace();
+                return;
+            }
+            if (projects == null) return;
+
+
+            //// Compose nice results
+            List<ProjectCheckResult> pluginResults = new ArrayList<>();
+            List<ProjectCheckResult> dataPackResults = new ArrayList<>();
+
+            currentCheck.incrementState();
+            currentCheck.setProgress(0);
+            currentCheck.setGoal(projects.size());
+
+
+            // Split projects per every "thread"
+            List<List<Project>> projectsPerThread = new ArrayList<>();
             for (int i = 0; i < PluginConfig.threads; i++) {
-                threadFiles.add(new ArrayList<>());
+                projectsPerThread.add(new ArrayList<>());
             }
 
-            for (int i = 0; i < files.size(); i++) {
-                int threadIndex = i % threadFiles.size();
-                threadFiles.get(threadIndex).add(files.get(i));
+            for (int i = 0; i < projects.size(); i++) {
+                int threadIndex = i % PluginConfig.threads;
+                projectsPerThread.get(threadIndex).add(projects.get(i));
             }
 
+            // Run through 'em projects
+            for (List<Project> projectList : projectsPerThread) {
+                if (projectList.isEmpty()) continue;
 
-            for (List<ProjectFile> fileList : threadFiles) {
                 Bukkit.getScheduler().runTaskAsynchronously(instance, () -> {
-                    for (ProjectFile file : fileList) {
-                        ProjectCheckResult result = checkFile(file);
-                        currentCheckState++;
-                        if (result == null) continue;
+                    for (Project project : projectList) {
+                        // Get this project's currently used version
+                        ProjectVersion currentVersion = null;
+                        synchronized (currentVersions) {
+                            for (ProjectVersion ver : currentVersions) {
+                                if (ver.getProjectId().equals(project.getId())) {
+                                    currentVersion = ver;
+                                    break;
+                                }
+                            }
 
-                        if (file.type().equals(ProjectFile.Type.PLUGIN)) {
-                            pluginResults.add(result);
-                            continue;
+                            currentVersions.remove(currentVersion);
                         }
 
-                        dataPackResults.add(result);
+
+                        // Check for newer versions
+                        boolean isDataPack = currentVersion.getLoaders().contains("datapack");
+
+                        List<ProjectVersion> newVersions;
+                        try {
+                            currentCheck.incrementRequests();
+                            currentCheck.incrementProgress();
+
+                            List<String> loaders = isDataPack ? List.of("datapack") : SUPPORTED_LOADERS;
+                            newVersions = modrinthAPI.getProjectVersions(project.getSlug(), loaders, MINECRAFT_VERSIONS);
+                        } catch (InterruptedException | IOException e) {
+                            YLogger.error(String.format("An error occurred while getting project versions for '%s'!", project.getSlug()));
+                            e.printStackTrace();
+                            continue;
+                        }
+                        if (newVersions == null) continue;
+
+                        // Create a project check result
+                        ProjectCheckResult projectCheck = new ProjectCheckResult(project, currentVersion, newVersions);
+                        if (isDataPack) dataPackResults.add(projectCheck);
+                        else pluginResults.add(projectCheck);
                     }
 
-                    if (currentCheckState != currentCheckGoal) return;
+                    // Check if all threads are finished
+                    if (currentCheck.getProgress() != currentCheck.getGoal()) return;
 
-                    Comparator<ProjectCheckResult> comparator = (left, right) -> {
-                        return left.project().getTitle().compareToIgnoreCase(right.project().getTitle());
-                    };
-
-                    pluginResults.sort(comparator);
-                    dataPackResults.sort(comparator);
+                    // Sort everything and create the end result
+                    pluginResults.sort(PROJECT_COMPARATOR);
+                    dataPackResults.sort(PROJECT_COMPARATOR);
 
                     long endTimestamp = System.currentTimeMillis();
                     CheckResult.Times times = new CheckResult.Times(startTimestamp, endTimestamp);
-                    CheckResult result = new CheckResult(pluginResults, pluginFiles.size(), dataPackResults, dataPackFiles.size(), times, currentCheckRequestsSent);
+                    CheckResult result = new CheckResult(pluginResults, pluginFiles.size(), dataPackResults, dataPackFiles.size(), times, currentCheck.getRequestsSent());
                     lastCheck = result;
 
                     isCheckRunning = false;
@@ -203,74 +283,12 @@ public class Checker {
         return result;
     }
 
-    private ProjectCheckResult checkFile(ProjectFile projectFile) {
-        File file = projectFile.file();
-        ProjectFile.Type type = projectFile.type();
-
-        HashCode hash;
-        try {
-            hash = Files.asByteSource(file).hash(Hashing.sha512());
-        } catch (IOException e) {
-            YLogger.error(String.format("An error occurred while hashing file '%s'!", file.getName()));
-            e.printStackTrace();
-            return null;
-        }
-
-
-        ProjectVersion currentVersion;
-        try {
-            currentCheckRequestsSent++;
-            currentVersion = modrinthAPI.getVersionFile(hash.toString());
-        } catch (InterruptedException|ExecutionException e) {
-            YLogger.error(String.format("An error occurred while getting current project version of file '%s'!", file.getName()));
-            e.printStackTrace();
-            return null;
-        }
-        if (currentVersion == null) return null;
-
-
-        Project project;
-        try {
-            currentCheckRequestsSent++;
-            project = modrinthAPI.getProject(currentVersion.getProjectId());
-        } catch (InterruptedException|ExecutionException e) {
-            YLogger.error(String.format("An error occurred while getting project with id '%s'!", currentVersion.getProjectId()));
-            e.printStackTrace();
-            return null;
-        }
-        if (project == null) return null;
-
-        boolean isDataPack = type.equals(ProjectFile.Type.DATAPACK);
-        List<ProjectVersion> versions;
-        try {
-            currentCheckRequestsSent++;
-
-            List<String> loaders = isDataPack ? List.of("datapack") : SUPPORTED_LOADERS;
-            versions = modrinthAPI.getProjectVersions(project.getSlug(), loaders, MINECRAFT_VERSIONS);
-        } catch (InterruptedException|ExecutionException e) {
-            YLogger.error(String.format("An error occurred while getting project versions for '%s'!", project.getSlug()));
-            e.printStackTrace();
-            return null;
-        }
-        if (versions == null) return null;
-
-        return new ProjectCheckResult(project, currentVersion, versions);
-    }
-
     public boolean isCheckRunning() {
         return isCheckRunning;
     }
 
-    public int getCurrentCheckState() {
-        return currentCheckState;
-    }
-
-    public int getCurrentCheckGoal() {
-        return currentCheckGoal;
-    }
-
-    public int getCurrentCheckRequestsSent() {
-        return currentCheckRequestsSent;
+    public CurrentCheck getCurrentCheck() {
+        return currentCheck;
     }
 
     public CheckResult getLastCheck() {
@@ -309,6 +327,69 @@ public class Checker {
             return true;
         } catch (ClassNotFoundException ignored) {
             return false;
+        }
+    }
+
+    public enum CheckState {
+        HASHING,
+        CHECKING_HASHES,
+        GETTING_PROJECTS,
+        GETTING_VERSIONS
+    }
+
+    public class CurrentCheck {
+        private CheckState state = CheckState.HASHING;
+        private final AtomicInteger progress = new AtomicInteger();
+        private final AtomicInteger goal = new AtomicInteger();
+        private final AtomicInteger requestsSent = new AtomicInteger();
+
+        private CurrentCheck() { }
+
+        private void reset() {
+            state = CheckState.HASHING;
+            progress.set(0);
+            goal.set(0);
+            requestsSent.set(0);
+        }
+
+        private void incrementState() {
+            switch (state) {
+                case HASHING -> state = CheckState.CHECKING_HASHES;
+                case CHECKING_HASHES -> state = CheckState.GETTING_PROJECTS;
+                case GETTING_PROJECTS -> state = CheckState.GETTING_VERSIONS;
+            }
+        }
+
+        private void incrementProgress() {
+            progress.incrementAndGet();
+        }
+
+        private void incrementRequests() {
+            requestsSent.incrementAndGet();
+        }
+
+        private void setProgress(int value) {
+            progress.set(value);
+        }
+
+        private void setGoal(int value) {
+            goal.set(value);
+        }
+
+        public CheckState getState() {
+            return state;
+        }
+
+        public int getProgress() {
+            return progress.get();
+        }
+
+        public int getGoal() {
+            return goal.get();
+        }
+
+        public int getRequestsSent() {
+            return requestsSent.get();
         }
     }
 }

@@ -11,7 +11,7 @@ It's really simple. Plugin hashes a file (.jar or .zip), checks the hash using M
 ### Additional info
 - Messages are fully customizable  with a lang file, supporting [PlaceholderAPI](https://github.com/PlaceholderAPI/PlaceholderAPI) and [MiniMessage](https://docs.advntr.dev/minimessage/index.html)
 - Commands have tab completions
-- Modrinth API is currently [rate limited](https://docs.modrinth.com/#section/Ratelimits) at 300 requests per minute per IP. Which means that an update check may take a little bit longer, if you have too many plugins/datapacks. (Plugin makes at least 1 request for each plugin/datapack, and then 2 more if it was found on Modrinth)
+- Modrinth API is currently [rate limited](https://docs.modrinth.com/#section/Ratelimits) at 300 requests per minute per IP. Which means that an update check may take a little bit longer, if you have wayyy too many plugins/datapacks ~~or if you spam the check command~~. (Plugin makes 1 request per every Modrinth project that you use)
 
 # Download
 You can download the plugin only on [Modrinth](https://modrinth.com/plugin/yupdatechecker) or compile it yourself.

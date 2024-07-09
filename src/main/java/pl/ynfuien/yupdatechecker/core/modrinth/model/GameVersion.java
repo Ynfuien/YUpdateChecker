@@ -6,10 +6,10 @@ import java.util.Map;
 // Inspiration from Modrinth4J
 // https://github.com/masecla22/Modrinth4J
 public class GameVersion {
-    private String version;
-    private String versionType;
-    private Instant date;
-    private boolean major;
+    private final String version;
+    private final String versionType;
+    private final Instant date;
+    private final boolean major;
 
     public GameVersion(Map<String, Object> jsonMap) {
         version = (String) jsonMap.get("version");
