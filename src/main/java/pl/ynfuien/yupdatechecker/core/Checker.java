@@ -215,8 +215,16 @@ public class Checker {
 
                         // Create a project check result
                         ProjectCheckResult projectCheck = new ProjectCheckResult(project, currentVersion, newVersions);
-                        if (isDataPack) dataPackResults.add(projectCheck);
-                        else pluginResults.add(projectCheck);
+                        if (isDataPack) {
+                            synchronized (dataPackResults) {
+                                dataPackResults.add(projectCheck);
+                            }
+                            continue;
+                        }
+
+                        synchronized (pluginResults) {
+                            pluginResults.add(projectCheck);
+                        }
                     }
 
                     // Check if all threads are finished
