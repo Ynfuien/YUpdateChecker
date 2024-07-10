@@ -73,15 +73,16 @@ command-updates-show:
   - '<hover:show_text:"<dark_gray>Date: <gray>{time-start-day}.{time-start-month}.{time-start-year}<br><dark_gray>Requests sent: <gray>{requests-sent}"><gray>Check was performed at <dark_gray>{time-start-hour}:{time-start-minute}:{time-start-second}</dark_gray> and took <dark_gray>{time-duration-minutes}m and {time-duration-seconds}s</dark_gray>.</hover>'
   - '<gray>Use <dark_gray>/{command} show <plugins | datapacks></dark_gray> for more details!'
 command-updates-show-usage: '{prefix} <gray>Command usage: /{command} show [plugins | datapacks] [page]'
-## Plugins
-# Placeholders for all messages:
+### Plugins
+## Placeholders for all messages:
 # {count}, {current-page}, {page-count}
-# For entries and url:
+## For entries and url:
 # {number}, {versions-behind}, {minecraft-version}, {release-channels}, {url}
-# {project-id}, {project-title}, color, color-hex, description, downloads, followers
-# {current-version-id}, {current-version-name}, number, changelog, date-published
+# {project-id}, {project-title}, color, color-hex, description, downloads, followers,
+# icon-url, source-url, wiki-url, issues-url, discord-url
+# {current-version-id}, {current-version-name}, number, downloads, changelog, date-published
 # with the same for {new-version-x},
-# And for the footer:
+## And for the footer:
 # {next-page}, {previous-page}
 command-updates-show-plugins-empty: '{prefix} <red>No plugins from Modrinth were found!'
 command-updates-show-plugins-header: '{prefix} <blue>Plugins:'
@@ -109,7 +110,7 @@ command-updates-show-datapacks-footer-page-previous: '<dark_gray><st>----------<
 command-updates-show-datapacks-footer-page-single: ''
 
 # Placeholders:
-# {progress}, {goal}
+# {progress}, {goal}, {requests-sent}
 check-progress-action-bar-hashing: '<gradient:gold:yellow>Hashing files: {progress} <gray>/</gray> {goal}'
 check-progress-action-bar-checking-hashes: '<gradient:gold:yellow>Checking hashes...'
 check-progress-action-bar-getting-projects: '<gradient:gold:yellow>Getting projects data...'

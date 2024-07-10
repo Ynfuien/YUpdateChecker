@@ -16,6 +16,7 @@ import pl.ynfuien.yupdatechecker.core.modrinth.model.ProjectVersion;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 public class ShowSubcommand implements Subcommand {
     private final YUpdateChecker instance;
@@ -157,11 +158,17 @@ public class ShowSubcommand implements Subcommand {
             placeholders.put("project-description", project.getDescription());
             placeholders.put("project-downloads", project.getDownloads());
             placeholders.put("project-followers", project.getFollowers());
+            placeholders.put("project-icon-url", project.getIconUrl() == null ? "N/A" : project.getIconUrl());
+            placeholders.put("project-source-url", project.getSourceUrl() == null ? "N/A" : project.getSourceUrl());
+            placeholders.put("project-wiki-url", project.getWikiUrl() == null ? "N/A" : project.getWikiUrl());
+            placeholders.put("project-issues-url", project.getIssuesUrl() == null ? "N/A" : project.getIssuesUrl());
+            placeholders.put("project-discord-url", project.getDiscordUrl() == null ? "N/A" : project.getDiscordUrl());
 
             ProjectVersion currentVer = projectResult.currentVersion();
             placeholders.put("current-version-id", currentVer.getId());
             placeholders.put("current-version-name", currentVer.getName());
             placeholders.put("current-version-number", currentVer.getVersionNumber());
+            placeholders.put("current-version-downloads", currentVer.getDownloads());
             placeholders.put("current-version-changelog", currentVer.getChangelog());
             placeholders.put("current-version-date-published", currentVer.getDatePublished());
 
