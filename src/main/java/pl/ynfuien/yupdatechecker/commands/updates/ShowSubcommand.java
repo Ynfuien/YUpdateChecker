@@ -16,7 +16,6 @@ import pl.ynfuien.yupdatechecker.core.modrinth.model.ProjectVersion;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 
 public class ShowSubcommand implements Subcommand {
     private final YUpdateChecker instance;
