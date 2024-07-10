@@ -26,7 +26,7 @@ You can download the plugin only on [Modrinth](https://modrinth.com/plugin/yupda
 
 # Media
 Checking updates<br/>
-![Gif presents an usage of the in-game commands. "/updates check" command is entered. Plugin proceeds to check updates while showing an action bar with current progress status. Upon completion a message is sent with a suggestion of running "/updates show" next. After running it, general data about the check is shown: how many plugins and datapacks were found on Modrinth, how many is up to date, and how long it took to complete the check.](https://i.imgur.com/M6m5OHq.gif)
+![Gif presents an usage of the in-game commands. "/updates check" command is entered. Plugin proceeds to check updates while showing an action bar with current progress status. Upon completion a message is sent with a suggestion of running "/updates show" next. After running it, general data about the check is shown: how many plugins and datapacks were found on Modrinth, how many is up to date, and how long it took to complete the check.](https://i.imgur.com/rea1vRx.gif)
 
 Looking through results<br/>
 ![Presented are results of "/updates show plugins" and "show datapacks". Those are split into pages of 10 items, each listed under one another, with a name of a plugin/datapack and an information whether it's up to date or whether it's X versions behind. Names of the projects can be hovered for additional info like description and current/new version numbers. When clicked it will open an url with the latest plugin/datapack version that meets the config and Minecraft version requirements.](https://i.imgur.com/llPpHuL.gif)
