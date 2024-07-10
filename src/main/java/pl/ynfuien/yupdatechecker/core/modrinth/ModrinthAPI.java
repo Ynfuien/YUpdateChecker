@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import net.moznion.uribuildertiny.URIBuilderTiny;
+import pl.ynfuien.ydevlib.messages.YLogger;
 import pl.ynfuien.yupdatechecker.core.modrinth.model.GameVersion;
 import pl.ynfuien.yupdatechecker.core.modrinth.model.Project;
 import pl.ynfuien.yupdatechecker.core.modrinth.model.ProjectVersion;
@@ -30,11 +31,11 @@ public class ModrinthAPI {
     private final HttpClient httpClient;
     private final String userAgent;
 
-    private final AtomicInteger requestCount = new AtomicInteger(300);
-    private final AtomicInteger timeLeft = new AtomicInteger(60);
+    private final AtomicInteger ratelimitLimit = new AtomicInteger(300);
+    private final AtomicInteger ratelimitLeft = new AtomicInteger(300);
+    private final AtomicInteger ratelimitReset = new AtomicInteger(60);
 
     private final static Gson GSON = new Gson();
-    private final static Type GSON_MAP_TYPE = new TypeToken<Map<String, Object>>(){}.getType();
     private final static Type GSON_MAP_MAP_TYPE = new TypeToken<Map<String, Map<String, Object>>>(){}.getType();
     private final static Type GSON_ARRAY_TYPE = new TypeToken<List<Map<String, Object>>>(){}.getType();
 
@@ -144,15 +145,20 @@ public class ModrinthAPI {
     }
 
     private String sendRequest(URI uri, String postData) throws IOException, InterruptedException {
-        // Check if we didn't hit the request limit already and wait if needed
-        if (requestCount.get() <= 0) {
-            Thread.sleep(((long) timeLeft.get() * 1000) + 1000);
+        // Check if we didn't hit the request limit and wait if needed
+        if (ratelimitLeft.get() <= 0) {
+            Thread.sleep(((long) ratelimitReset.get() * 1000) + 1000);
+
+            synchronized (ratelimitLeft) {
+                if (ratelimitLeft.get() <= 0) ratelimitLeft.set(ratelimitLimit.get());
+            }
 
             // Perform the request
             return sendRequest(uri, postData);
         }
-        requestCount.decrementAndGet();
+        ratelimitLeft.decrementAndGet();
 
+        // Create the request
         HttpRequest.Builder builder = HttpRequest.newBuilder(uri)
                 .header("User-Agent", userAgent)
                 .GET();
@@ -162,14 +168,24 @@ public class ModrinthAPI {
                     .header("Content-Type", "application/json");
         }
 
+        // And perform it
         HttpResponse<String> response = httpClient.send(builder.build(), HttpResponse.BodyHandlers.ofString());
 
         // Set remaining request limit from the headers
         HttpHeaders headers = response.headers();
-        requestCount.set(Integer.parseInt(headers.firstValue("X-Ratelimit-Remaining").orElse("300")));
-        timeLeft.set(Integer.parseInt(headers.firstValue("X-Ratelimit-Reset").orElse("60")));
+        ratelimitLimit.set(Integer.parseInt(headers.firstValue("X-Ratelimit-Limit").orElse("300")));
+        ratelimitLeft.set(Integer.parseInt(headers.firstValue("X-Ratelimit-Remaining").orElse("300")));
+        ratelimitReset.set(Integer.parseInt(headers.firstValue("X-Ratelimit-Reset").orElse("60")));
 
-        return response.statusCode() == 200 ? response.body() : null;
+        // Too many requests
+        int code = response.statusCode();
+        if (code == 429) {
+            YLogger.error("Modrinth API ratelimit has been hit! Waiting for it to reset...");
+            ratelimitLeft.set(0);
+            return sendRequest(uri, postData);
+        }
+
+        return code == 200 ? response.body() : null;
     }
 
     public record UserAgent(String author, String projectName, String version, String contact) {
