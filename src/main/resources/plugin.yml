@@ -6,6 +6,7 @@ softdepend: [ PlaceholderAPI ]
 authors: [ Ynfuien ]
 description: '${project.description}'
 website: '${project.url}'
+folia-supported: true
 
 commands:
   yupdatechecker:

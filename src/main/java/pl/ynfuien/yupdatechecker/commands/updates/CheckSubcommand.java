@@ -14,6 +14,7 @@ import pl.ynfuien.yupdatechecker.core.Checker;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class CheckSubcommand implements Subcommand {
     private final YUpdateChecker instance;
@@ -79,7 +80,7 @@ public class CheckSubcommand implements Subcommand {
         if (!(sender instanceof Player p)) return;
 
         Checker.CurrentCheck currentCheck = checker.getCurrentCheck();
-        Bukkit.getScheduler().runTaskTimerAsynchronously(instance, (task) -> {
+        Bukkit.getAsyncScheduler().runAtFixedRate(instance, (task) -> {
             if (!p.isOnline()) {
                 task.cancel();
                 return;
@@ -103,7 +104,7 @@ public class CheckSubcommand implements Subcommand {
             if (message != null) p.sendActionBar(message.getComponent(sender, placeholders));
 
             if (!checker.isCheckRunning()) task.cancel();
-        }, 2, PluginConfig.actionBarInterval);
+        }, 2 * 50, (long) PluginConfig.actionBarInterval * 50, TimeUnit.MILLISECONDS);
     }
 
     @Override

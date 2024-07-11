@@ -5,7 +5,6 @@ import com.google.common.hash.Hashing;
 import com.google.common.io.Files;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
-import org.bukkit.scheduler.BukkitTask;
 import pl.ynfuien.ydevlib.messages.YLogger;
 import pl.ynfuien.yupdatechecker.YUpdateChecker;
 import pl.ynfuien.yupdatechecker.config.PluginConfig;
@@ -50,12 +49,7 @@ public class Checker {
             currentCheck.incrementRequests();
             versions = modrinthAPI.getGameVersionTags();
         } catch (InterruptedException | IOException e) {
-//            if (e.getCause() instanceof UnknownHostException) {
-//                YLogger.error("An error occurred while fetching Minecraft versions. Is there an internet connection?");
-//            } else {
-                YLogger.error("An error occurred while fetching Minecraft versions:");
-//            }
-
+            YLogger.error("An error occurred while fetching Minecraft versions:");
             e.printStackTrace();
             return null;
         }
@@ -81,7 +75,7 @@ public class Checker {
         CompletableFuture<CheckResult> future = new CompletableFuture<>();
 
 
-        Bukkit.getScheduler().runTaskAsynchronously(instance, () -> {
+        Bukkit.getAsyncScheduler().runNow(instance, (task) -> {
             long startTimestamp = System.currentTimeMillis();
 
             // Get plugin and datapack files
@@ -182,7 +176,7 @@ public class Checker {
             for (List<Project> projectList : projectsPerThread) {
                 if (projectList.isEmpty()) continue;
 
-                BukkitTask thread = Bukkit.getScheduler().runTaskAsynchronously(instance, () -> {
+                Bukkit.getAsyncScheduler().runNow(instance, (task2) -> {
                     for (Project project : projectList) {
                         if (stopCheck) return;
 
@@ -246,7 +240,7 @@ public class Checker {
                     future.complete(result);
                 });
 
-                currentCheck.addTask(thread);
+//                currentCheck.addTask(thread);
             }
         });
 
@@ -304,14 +298,7 @@ public class Checker {
         if (!isCheckRunning) return;
 
         stopCheck = true;
-
-        List<BukkitTask> tasks = currentCheck.getTasks();
-        for (BukkitTask task : tasks) {
-            if (task.isCancelled()) continue;
-
-            task.cancel();
-        }
-        tasks.clear();
+        Bukkit.getAsyncScheduler().cancelTasks(instance);
     }
 
     public CurrentCheck getCurrentCheck() {
@@ -369,7 +356,6 @@ public class Checker {
         private final AtomicInteger progress = new AtomicInteger();
         private final AtomicInteger goal = new AtomicInteger();
         private final AtomicInteger requestsSent = new AtomicInteger();
-        private final List<BukkitTask> tasks = new ArrayList<>();
 
         private CurrentCheck() { }
 
@@ -378,7 +364,6 @@ public class Checker {
             progress.set(0);
             goal.set(0);
             requestsSent.set(0);
-            tasks.clear();
         }
 
         private void incrementState() {
@@ -419,14 +404,6 @@ public class Checker {
 
         public int getRequestsSent() {
             return requestsSent.get();
-        }
-
-        public void addTask(BukkitTask task) {
-            tasks.add(task);
-        }
-
-        public List<BukkitTask> getTasks() {
-            return tasks;
         }
     }
 }

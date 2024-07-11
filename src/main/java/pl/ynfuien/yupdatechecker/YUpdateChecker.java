@@ -54,7 +54,7 @@ public final class YUpdateChecker extends JavaPlugin {
 
         // Startup update check
         if (PluginConfig.onStartup) {
-            Bukkit.getScheduler().runTaskAsynchronously(instance, () -> {
+            Bukkit.getAsyncScheduler().runNow(instance, (task) -> {
                 HashMap<String, Object> placeholders = new HashMap<>() {{put("command", "updates");}};
                 ConsoleCommandSender console = Bukkit.getConsoleSender();
 
