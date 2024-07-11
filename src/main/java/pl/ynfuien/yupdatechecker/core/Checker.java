@@ -310,11 +310,22 @@ public class Checker {
     }
 
     private static List<String> getSupportedLoaders() {
+        if (isRunningFolia()) return List.of("folia");
+
         if (isRunningPurpur()) return List.of("bukkit", "spigot", "paper", "purpur");
         if (isRunningPaper()) return List.of("bukkit", "spigot", "paper");
         if (isRunningSpigot()) return List.of("bukkit", "spigot");
 
         return List.of("bukkit");
+    }
+
+    private static boolean isRunningFolia() {
+        try {
+            Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
+            return true;
+        } catch (ClassNotFoundException ignored) {
+            return false;
+        }
     }
 
     private static boolean isRunningPurpur() {
