@@ -5,6 +5,7 @@ import com.google.common.hash.Hashing;
 import com.google.common.io.Files;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.scheduler.BukkitTask;
 import pl.ynfuien.ydevlib.messages.YLogger;
 import pl.ynfuien.yupdatechecker.YUpdateChecker;
 import pl.ynfuien.yupdatechecker.config.PluginConfig;
@@ -35,7 +36,8 @@ public class Checker {
     private CheckResult lastCheck = null;
 
     private boolean isCheckRunning = false;
-    private CurrentCheck currentCheck = new CurrentCheck();
+    private final CurrentCheck currentCheck = new CurrentCheck();
+    private boolean stopCheck = false;
 
     public Checker(YUpdateChecker instance) {
         this.instance = instance;
@@ -180,8 +182,10 @@ public class Checker {
             for (List<Project> projectList : projectsPerThread) {
                 if (projectList.isEmpty()) continue;
 
-                Bukkit.getScheduler().runTaskAsynchronously(instance, () -> {
+                BukkitTask thread = Bukkit.getScheduler().runTaskAsynchronously(instance, () -> {
                     for (Project project : projectList) {
+                        if (stopCheck) return;
+
                         // Get this project's currently used version
                         ProjectVersion currentVersion = null;
                         synchronized (currentVersions) {
@@ -194,7 +198,6 @@ public class Checker {
 
                             currentVersions.remove(currentVersion);
                         }
-
 
                         // Check for newer versions
                         boolean isDataPack = currentVersion.getLoaders().contains("datapack");
@@ -242,6 +245,8 @@ public class Checker {
                     isCheckRunning = false;
                     future.complete(result);
                 });
+
+                currentCheck.addTask(thread);
             }
         });
 
@@ -293,6 +298,20 @@ public class Checker {
 
     public boolean isCheckRunning() {
         return isCheckRunning;
+    }
+
+    public void stopCheck() {
+        if (!isCheckRunning) return;
+
+        stopCheck = true;
+
+        List<BukkitTask> tasks = currentCheck.getTasks();
+        for (BukkitTask task : tasks) {
+            if (task.isCancelled()) continue;
+
+            task.cancel();
+        }
+        tasks.clear();
     }
 
     public CurrentCheck getCurrentCheck() {
@@ -350,6 +369,7 @@ public class Checker {
         private final AtomicInteger progress = new AtomicInteger();
         private final AtomicInteger goal = new AtomicInteger();
         private final AtomicInteger requestsSent = new AtomicInteger();
+        private final List<BukkitTask> tasks = new ArrayList<>();
 
         private CurrentCheck() { }
 
@@ -358,6 +378,7 @@ public class Checker {
             progress.set(0);
             goal.set(0);
             requestsSent.set(0);
+            tasks.clear();
         }
 
         private void incrementState() {
@@ -398,6 +419,14 @@ public class Checker {
 
         public int getRequestsSent() {
             return requestsSent.get();
+        }
+
+        public void addTask(BukkitTask task) {
+            tasks.add(task);
+        }
+
+        public List<BukkitTask> getTasks() {
+            return tasks;
         }
     }
 }

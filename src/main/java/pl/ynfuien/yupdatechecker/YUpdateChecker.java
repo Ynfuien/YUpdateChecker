@@ -76,6 +76,8 @@ public final class YUpdateChecker extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        checker.stopCheck();
+
         YLogger.info("Plugin successfully <red>disabled<white>!");
     }
 
