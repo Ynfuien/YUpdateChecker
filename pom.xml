@@ -6,7 +6,7 @@
 
     <groupId>pl.ynfuien</groupId>
     <artifactId>YUpdateChecker</artifactId>
-    <version>0.0.3</version>
+    <version>0.0.4</version>
     <packaging>jar</packaging>
 
     <name>YUpdateChecker</name>
@@ -114,7 +114,7 @@
         <dependency>
             <groupId>com.github.Ynfuien</groupId>
             <artifactId>YDevLib</artifactId>
-            <version>1.0.2</version>
+            <version>1.0.3</version>
             <scope>compile</scope>
         </dependency>
 

@@ -59,7 +59,9 @@ public class Project {
 
         downloads = ((Double) jsonMap.get("downloads")).intValue();
         followers = ((Double) jsonMap.get("followers")).intValue();
-        color = ((Double) jsonMap.get("color")).intValue();
+
+        Object colorValue = jsonMap.get("color");
+        color = colorValue == null ? 0 : ((Double) colorValue).intValue();
         team = (String) jsonMap.get("team");
 
         published = Instant.parse((String) jsonMap.get("published"));
